@@ -1,0 +1,14 @@
+{
+	"id": "vandaltro",
+	"name": "Vandaltro",
+	"display_name": "Vandal",
+	"author": ["Supersonic2510"],
+	"description": "Mod Funny de Balatro para EsVandal pera",
+	"prefix": "vandal",
+	"main_file": "main.lua",
+	"priority": 0,
+	"badge_colour": "468A8A",
+	"badge_text_colour": "FEFEFE",
+	"version": "0.🐴.🧏",
+	"dependencies": [],
+}

@@ -1,0 +1,114 @@
+-- Register the custom sound "choese" (must exist at assets/sounds/choese.ogg)
+SMODS.Sound {
+    key = "choese_sound",
+    path = "choese.ogg"
+}
+
+-- Define the custom Joker card "Choese"
+SMODS.Joker {
+    -- Internal identifier (must be unique)
+    key = "choese",
+
+    -- Sprite sheet position (based on jokers.png at 71x95 grid)
+    atlas = "jokers",
+    pos = { x = 0, y = 0 },
+
+    -- Rarity level: 3 = Rare
+    rarity = 3,
+
+    -- Add this Joker to the general Joker pool
+    pools = {
+        ["Joker"] = true
+    },
+
+    -- Optional config (not used)
+    config = {},
+
+    -- Compatibility flags
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+
+    -- Called once when the Joker is first added to the player's deck
+    set_ability = function(self, card, initial, delay_sprites)
+        card.ability.choese_bonus = 1               -- Total accumulated multiplier
+        card.ability.this_discard_bonus = 0         -- Cards discarded during current discard
+        card.ability.three_counter = 0              -- Count of 3s discarded during current discard
+        sendInfoMessage("Choese initialized: bonus = 0, 3's = 0", "ChoeseJoker")
+    end,
+
+    -- Provides dynamic tooltip variable substitution
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.choese_bonus or 1       -- Replaces {#1#} in description
+            },
+            key = "j_vandal_choese",
+            set = "Joker",
+        }
+    end,
+
+    -- Called automatically by the game in many gameplay contexts
+    calculate = function(self, card, context)
+
+        -- Reset bonus when transitioning to a new round (new level)
+        if context.round_resets then
+            card.ability.choese_bonus = 1
+            card.ability.this_discard_bonus = 0
+            card.ability.three_counter = 0
+        end
+
+        -- TODO: Try to balance
+        -- if context.pre_discard then
+        --     card.ability.choese_bonus = 1
+        --     card.ability.this_discard_bonus = 0
+        --     card.ability.three_counter = 0
+        -- end
+
+        -- Called for each card discarded
+        if context.discard and context.other_card then
+            -- Procesar cada carta individual
+            card.ability.this_discard_bonus = card.ability.this_discard_bonus + 0.25
+
+            sendInfoMessage("+1! Discard Bonus " .. card.ability.this_discard_bonus, "ChoeseJoker")
+
+            if tonumber(context.other_card.base.value) == 3 then
+                card.ability.three_counter = card.ability.three_counter + 1
+                sendInfoMessage("3 discarded! Total 3s = " .. card.ability.three_counter, "ChoeseJoker")
+            end
+
+            -- Si esta es la última carta en el batch de descartes
+            local all = context.full_hand or {}
+            if #all > 0 and context.other_card == all[#all] then
+                local n = card.ability.this_discard_bonus
+                local t = card.ability.three_counter
+                local base_bonus = card.ability.choese_bonus + n
+
+                card.ability.choese_bonus = base_bonus * (2 ^t)
+
+                sendInfoMessage("Final discard: +" .. base_bonus .. " (cards=" .. n .. ", threes=" .. t .. ")", "ChoeseJoker")
+
+                -- Reset parcial (mantener choese_bonus para scoring)
+                card.ability.this_discard_bonus = 0
+                card.ability.three_counter = 0
+            end
+        end
+
+        -- Apply bonus during scoring
+        if context.joker_main and card.ability.choese_bonus > 1 then
+            -- Apply multiplier only
+            local final_mult = card.ability.choese_bonus
+            sendInfoMessage("Applying x" .. final_mult .. " multiplier", "ChoeseJoker")
+
+            -- Reset
+            card.ability.choese_bonus = 1
+
+            return { 
+                xmult = final_mult,
+                message = localize("j_vandal_k_choese_triggered", "v_text"),
+                sound = "vandal_choese_sound",
+            }
+          
+            end
+    end,
+}
