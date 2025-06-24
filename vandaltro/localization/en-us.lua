@@ -12,7 +12,7 @@ return {
                     "for every {C:attention}Discarted Card{},",
                     "{C:attention}Discarted 3s{} {C:blue}doubles{} {C:mult}Mult{}",
                     "{C:attention}Resets{} on hand or round end",
-                    "{C:inactive}(Currently {}{C:mult}X#1#{}{C:inactive} Mult){}",
+                    "{C:inactive}(Currently {}{X:mult,C:white}X#1#{}{C:inactive} Mult){}",
                 },
             }
         },
@@ -40,10 +40,13 @@ return {
         suits_plural={},
         suits_singular={},
         tutorial={},
-        v_dictionary={},
-        v_text={
+        v_text={},
+        v_dictionary={
             j_vandal_k_choese_triggered = {
                 "Maximum Choese!",
+            },
+            j_vandal_k_choese_calc = {
+                "{X:mult,C:white}X#1#{} Mult"
             }
         },
     },

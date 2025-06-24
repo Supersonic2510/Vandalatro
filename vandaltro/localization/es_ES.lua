@@ -12,7 +12,7 @@ return {
                     "por cada {C:attention}carta descartada{}.",
                     "Los {C:attention}3 descartados{} {C:blue}duplican{} el {C:mult}multi{}.",
                     "{C:attention}se reinicia{} al jugar mano o acabar ronda.",
-                    "{C:inactive}(Actual: {C:mult}X#1#{C:inactive}){}",
+                    "{C:inactive}(Actual: multi {X:mult,C:white}X#1#{C:inactive}){}",
                 },
             },
         },
@@ -40,10 +40,13 @@ return {
         suits_plural={},
         suits_singular={},
         tutorial={},
-        v_dictionary={},
-        v_text={
+        v_text={},
+        v_dictionary={
             j_vandal_k_choese_triggered = {
                 "¡Choese Máximo!",
+            },
+            j_vandal_k_choese_calc = {
+                "{X:mult,C:white}X#1#{} multi"
             }
         },
     },

@@ -34,7 +34,6 @@ SMODS.Joker {
         card.ability.choese_bonus = 1               -- Total accumulated multiplier
         card.ability.this_discard_bonus = 0         -- Cards discarded during current discard
         card.ability.three_counter = 0              -- Count of 3s discarded during current discard
-        sendInfoMessage("Choese initialized: bonus = 0, 3's = 0", "ChoeseJoker")
     end,
 
     -- Provides dynamic tooltip variable substitution
@@ -70,11 +69,8 @@ SMODS.Joker {
             -- Procesar cada carta individual
             card.ability.this_discard_bonus = card.ability.this_discard_bonus + 0.25
 
-            sendInfoMessage("+1! Discard Bonus " .. card.ability.this_discard_bonus, "ChoeseJoker")
-
             if tonumber(context.other_card.base.value) == 3 then
                 card.ability.three_counter = card.ability.three_counter + 1
-                sendInfoMessage("3 discarded! Total 3s = " .. card.ability.three_counter, "ChoeseJoker")
             end
 
             -- Si esta es la última carta en el batch de descartes
@@ -86,11 +82,20 @@ SMODS.Joker {
 
                 card.ability.choese_bonus = base_bonus * (2 ^t)
 
-                sendInfoMessage("Final discard: +" .. base_bonus .. " (cards=" .. n .. ", threes=" .. t .. ")", "ChoeseJoker")
-
                 -- Reset parcial (mantener choese_bonus para scoring)
                 card.ability.this_discard_bonus = 0
                 card.ability.three_counter = 0
+
+                return {
+                    message = localize{
+                        type = "variable",
+                        key = "j_vandal_k_choese_calc",
+                        vars = { 
+                            card.ability.choese_bonus or 1,
+                        },
+                    },
+                    sound = "generic1"
+                }
             end
         end
 
@@ -98,14 +103,16 @@ SMODS.Joker {
         if context.joker_main and card.ability.choese_bonus > 1 then
             -- Apply multiplier only
             local final_mult = card.ability.choese_bonus
-            sendInfoMessage("Applying x" .. final_mult .. " multiplier", "ChoeseJoker")
 
             -- Reset
             card.ability.choese_bonus = 1
 
             return { 
                 xmult = final_mult,
-                message = localize("j_vandal_k_choese_triggered", "v_text"),
+                message = localize{
+                    type = "variable",
+                    key = "j_vandal_k_choese_triggered",
+                },
                 sound = "vandal_choese_sound",
             }
           
