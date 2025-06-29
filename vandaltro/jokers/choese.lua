@@ -16,10 +16,17 @@ SMODS.Joker {
     -- Rarity level: 3 = Rare
     rarity = 3,
 
+    -- Set cost to $3
+    cost = 3,
+
     -- Add this Joker to the general Joker pool
     pools = {
         ["Joker"] = true
     },
+
+    -- Make it availabe from start
+    unlocked = true,
+    discovered = true,
 
     -- Optional config (not used)
     config = {},
@@ -38,6 +45,8 @@ SMODS.Joker {
 
     -- Provides dynamic tooltip variable substitution
     loc_vars = function(self, info_queue, card)
+        -- TODO: Add info_queue to credit Joker artist
+        -- info_queue[#info_queue+1] = 
         return {
             vars = {
                 card.ability.choese_bonus or 1       -- Replaces {#1#} in description
@@ -57,23 +66,16 @@ SMODS.Joker {
             card.ability.three_counter = 0
         end
 
-        -- TODO: Try to balance
-        -- if context.pre_discard then
-        --     card.ability.choese_bonus = 1
-        --     card.ability.this_discard_bonus = 0
-        --     card.ability.three_counter = 0
-        -- end
-
         -- Called for each card discarded
         if context.discard and context.other_card then
-            -- Procesar cada carta individual
+            -- Add each discarted card
             card.ability.this_discard_bonus = card.ability.this_discard_bonus + 0.25
 
             if tonumber(context.other_card.base.value) == 3 then
                 card.ability.three_counter = card.ability.three_counter + 1
             end
 
-            -- Si esta es la última carta en el batch de descartes
+            -- If last hand's card
             local all = context.full_hand or {}
             if #all > 0 and context.other_card == all[#all] then
                 local n = card.ability.this_discard_bonus
@@ -82,7 +84,7 @@ SMODS.Joker {
 
                 card.ability.choese_bonus = base_bonus * (2 ^t)
 
-                -- Reset parcial (mantener choese_bonus para scoring)
+                -- Partial reset (keep choese bonus for scoring)
                 card.ability.this_discard_bonus = 0
                 card.ability.three_counter = 0
 
